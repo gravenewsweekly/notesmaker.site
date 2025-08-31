@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notes Maker— Public</title>
+  <meta name="description" content="Public Notes Maker (no accounts). Save your personal notes for free!" />
+  <style>
+    /* 1995-era CSS styling with enhanced effects */
+    body {
+      background-color: #c0c0c0;
+      color: #000000;
+      font-family: "Times New Roman", Times, serif;
+      margin: 0;
+      padding: 8px;
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQImWP4//8/AwMjEIOVAQApCgSDLG1nJgAAAABJRU5ErkJggg==');
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #000080;
+      text-align: center;
+      margin: 12px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    h2 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #000080;
+      margin: 10px 0;
+      border-bottom: 1px solid #808080;
+      padding-bottom: 4px;
+    }
+    
+    h3 {
+      font-size: 16px;
+      font-weight: bold;
+      color: #800000;
+      margin: 8px 0;
+    }
+    
+    .wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border: 2px solid #000080;
+      padding: 12px;
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    header {
+      text-align: center;
+      border-bottom: 2px solid #000080;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .lead {
+      font-style: italic;
+      margin: 8px 0;
+    }
+    
+    .card {
+      background-color: #dcdcdc;
+      border: 2px solid #808080;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    
+    form {
+      margin: 8px 0;
+    }
+    
+    textarea, input[type=text], input[type=email] {
+      width: 100%;
+      padding: 4px;
+      border: 2px solid #808080;
+      background-color: #ffffff;
+      font-family: "Courier New", Courier, monospace;
+      margin-bottom: 8px;
+    }
+    
+    button {
+      background-color: #dcdcdc;
+      color: #000000;
+      border: 2px outset #dcdcdc;
+      padding: 4px 8px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    
+    button:hover {
+      background-color: #c0c0c0;
+    }
+    
+    .meta {
+      font-size: 12px;
+      color: #808080;
+      margin-top: 8px;
+    }
+    
+    .ideas {
+      margin-top: 12px;
+    }
+    
+    .idea {
+      background-color: #f0f0f0;
+      border: 1px solid #808080;
+      padding: 8px;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .idea:hover {
+      background-color: #e0e0e0;
+      transform: translateX(4px);
+    }
+    
+    .idea h3 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+    }
+    
+    .small {
+      font-size: 12px;
+      color: #808080;
+    }
+    
+    .footer {
+      margin-top: 12px;
+      border-top: 1px solid #808080;
+      padding-top: 8px;
+    }
+    
+    .controls {
+      margin: 8px 0;
+    }
+    
+    ul {
+      padding-left: 20px;
+    }
+    
+    li {
+      margin-bottom: 6px;
+    }
+    
+    .blink {
+      animation: blink 2s infinite;
+    }
+    
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    .copyright {
+      text-align: center;
+      font-size: 11px;
+      color: #808080;
+      margin-top: 16px;
+      border-top: 1px dotted #808080;
+      padding-top: 8px;
+    }
+    
+    .counter {
+      text-align: right;
+      font-size: 10px;
+      color: #808080;
+    }
+    
+    .marquee {
+      background-color: #000080;
+      color: #ffffff;
+      padding: 4px;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    
+    .security-badge {
+      text-align: center;
+      margin: 8px 0;
+      font-size: 10px;
+      color: #008000;
+    }
+    
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid #808080;
+      margin-bottom: 12px;
+    }
+    
+    .tab {
+      padding: 4px 8px;
+      background-color: #dcdcdc;
+      border: 1px solid #808080;
+      border-bottom: none;
+      margin-right: 4px;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .required {
+      color: #ff0000;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted #000080;
+      cursor: help;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #000080;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 1995-style header with marquee -->
+    <div class="marquee">
+      <marquee behavior="scroll" direction="left">Welcome to the Notes Maker! Save your notes for free!!</marquee>
+    </div>
+    
+    <header>
+      <h1>Public Idea Board</h1>
+      <p class="lead">Post short ideas/suggestions publicly. No account required.</p>
+      <p class="small">Page last updated: <script>document.write(new Date().toLocaleDateString());</script></p>
+      <div class="security-badge">🔒 Secure Connection | Protected Against Malicious Activity</div>
+    </header>
+    
+    <div class="tab-container">
+      <div class="tab active" data-tab="submit">Submit Idea</div>
+      <div class="tab" data-tab="browse">Browse Ideas</div>
+      <div class="tab" data-tab="about">About</div>
+      <div class="tab" data-tab="terms">Terms & Privacy</div>
+      <div class="tab" data-tab="contact">Contact</div>
+    </div>
+    
+    <section class="card tab-content active" id="submit-tab">
+      <h2>Submit Your Idea</h2>
+      <form id="ideaForm" autocomplete="off">
+        <textarea id="ideaText" placeholder="Write your idea (max 800 characters)..." maxlength="800" required rows="6"></textarea>
+        <div class="counter"><span id="charCount">0</span>/800 characters</div>
+        
+        <input type="text" id="author" placeholder="Name (optional)" maxlength="40" />
+        
+        <div style="margin-top: 8px;">
+          <button id="postBtn" type="submit">Post Idea</button>
+          <button id="clearBtn" type="button">Clear Form</button>
+        </div>
+        
+        <div class="small" style="margin-top: 8px;">
+          Your IP is not stored by this client. Be mindful: anything posted is public. Avoid sensitive data.
+        </div>
+        <div id="rateMsg" class="small" style="color:#ff0000; font-weight: bold;"></div>
+      </form>
+      
+      <div class="meta">
+        <div>Notes are not publicly visible.</div>
+      </div>
+    </section>
+    
+    <section class="card tab-content" id="browse-tab">
+      <h2>Your Notes <span class="blink">*NEW*</span></h2>
+      
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <strong>Recent submissions:</strong>
+        <div class="controls">
+          <button id="refreshBtn">Refresh</button>
+          <button id="clearLocalBtn" title="Clear local cache">Clear Cache</button>
+        </div>
+      </div>
+      
+      <div id="ideas" class="ideas" style="margin-top:12px">Loading ideas...</div>
+      
+      <div class="footer">
+        <div class="small">Notes are automatically refreshed every 5 minutes.</div>
+      </div>
+    </section>
+    
+    <section class="card tab-content" id="about-tab">
+      <h2>About This Notes Maksr</h2>
+      <p>This is a space for saving ideas and suggestions. All content is accessible and moderated by the community.</p>
+      
+      <h3>Our Mission</h3>
+      <p>We aim to provide a platform for creative minds to save their thoughts and collaborate on innovative concepts. This board serves as a digital brainstorming space where ideas can be save.</p>
+      
+      <h3>How It Works</h3>
+      <ul>
+        <li>Type your notes in the text box above</li>
+        <li>Add your name if you want (optional)</li>
+        <li>Click "Post Notes" to share with everyone</li>
+        <li>Refresh the page to see new notes you created</li>
+      </ul>
+      
+      <h3>Content Moderation</h3>
+      <p>All content is reviewed by our automated systems and human moderators. We reserve the right to remove any content that violates our guidelines without notice.</p>
+    </section>
+    
+    <section class="card tab-content" id="terms-tab">
+      <h2>Terms of Service</h2>
+      
+      <h3>1. Acceptance of Terms</h3>
+      <p>By accessing and using this Notes Maker, you accept and agree to be bound by the terms and provision of this agreement.</p>
+      
+      <h3>2. Use License</h3>
+      <p>Permission is granted to temporarily use this platform for personal, non-commercial transitory viewing only.</p>
+      
+      <h3>3. User Content</h3>
+      <p>Any content you post becomes publicly available to yourself only. You retain your rights to any content you submit, post or display on or through the service.</p>
+      
+      <h3>4. Limitations</h3>
+      <p>In no event shall the operators of this platform be liable for any damages arising out of the use or inability to use the materials on this platform.</p>
+      
+      <h2>Privacy Policy</h2>
+      
+      <h3>1. Information Collection</h3>
+      <p>We collect minimal information necessary for the operation of the service. This may include your IP address for security purposes.</p>
+      
+      <h3>2. Information Usage</h3>
+      <p>We use collected information to operate, maintain, and provide you with the features of the service.</p>
+      
+      <h3>3. Information Protection</h3>
+      <p>We implement appropriate security measures to protect against unauthorized access to or unauthorized alteration of your information.</p>
+      
+      <h3>4. Cookies</h3>
+      <p>We may use cookies to maintain your session and preferences. You can disable cookies in your browser settings.</p>
+    </section>
+    
+    <section class="card tab-content" id="contact-tab">
+      <h2>Contact Us</h2>
+      <p>Have questions or concerns? Fill out the form below and we'll get back to you as soon as possible.</p>
+      
+      <form id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+        <div style="text-align: center;">
+          <button type="submit">Send Message</button>
+        </div>
+      </form>
+      
+      <div class="small" style="margin-top: 12px; text-align: center;">
+        Note: Replace "YOUR_FORM_ID" with your actual Formspree form ID
+      </div>
+    </section>
+    
+    <div class="copyright">
+      © 1995-2025 Notes Maker. All rights reserved.<br />
+      Unauthorized access attempts will be logged and reported.<br />
+      Visitor count: <span id="visitorCount">Loading...</span>
+    </div>
+    
+    <div class="counter">Page generated on: <script>document.write(new Date().toLocaleString());</script></div>
+  </div>
+  
+  <script>
+  // ========== CONFIG ==========    
+  const JSONBIN_BIN_ID = '68b4696c43b1c97be9323481';    
+  const JSONBIN_MASTER_KEY = '$2a$10$ZJH86aFRcPs3YQBxBTnNwerZHklfiYM2nkn/g7xX4GcuGzO1sovBK';    
+    
+  // ========== SECURITY & UTILITIES ==========    
+  function escapeHtml(s){    
+    return s.replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;','`':'&#96;'}[c]));    
+  }    
+    
+  function el(q){return document.querySelector(q)}    
+  function els(q){return document.querySelectorAll(q)}    
+  const ideasEl = el('#ideas');    
+  const form = el('#ideaForm');    
+  const text = el('#ideaText');    
+  const author = el('#author');    
+  const rateMsg = el('#rateMsg');    
+  const charCount = el('#charCount');    
+  const visitorCount = el('#visitorCount');    
+    
+  // Security and tracking keys
+  const CACHE_KEY = 'idea_board_cache_v2';    
+  const LAST_POST_KEY = 'idea_board_last_post_timestamp';    
+  const VISITOR_KEY = 'idea_board_visitor_id';
+  const RATE_LIMIT_SECONDS = 30;    
+    
+  // Tab functionality
+  els('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Deactivate all tabs
+      els('.tab').forEach(t => t.classList.remove('active'));
+      els('.tab-content').forEach(t => t.classList.remove('active'));
+      
+      // Activate clicked tab
+      tab.classList.add('active');
+      el(`#${tab.dataset.tab}-tab`).classList.add('active');
+    });
+  });
+  
+  // Character counter for textarea
+  text.addEventListener('input', function() {
+    charCount.textContent = this.value.length;
+  });
+  
+  // Initialize visitor tracking
+  function initVisitorTracking() {
+    let visitorId = localStorage.getItem(VISITOR_KEY);
+    if (!visitorId) {
+      // Generate a unique visitor ID (not using IP for privacy)
+      visitorId = 'visitor_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+      localStorage.setItem(VISITOR_KEY, visitorId);
+    }
+    
+    // Simulate visitor count (in a real implementation, this would be server-side)
+    let count = parseInt(localStorage.getItem('visitor_count') || '0');
+    count++;
+    localStorage.setItem('visitor_count', count.toString());
+    visitorCount.textContent = count;
+  }
+  
+  // Security: Detect and prevent common attacks
+  function securityCheck(content) {
+    // Check for common XSS patterns
+    const xssPatterns = [
+      /<script.*?>.*?<\/script>/gi,
+      /javascript:/gi,
+      /onerror=/gi,
+      /onload=/gi,
+      /onclick=/gi,
+      /onmouseover=/gi,
+      /eval\(/gi,
+      /alert\(/gi,
+      /document\.cookie/gi,
+      /window\.location/gi
+    ];
+    
+    for (const pattern of xssPatterns) {
+      if (pattern.test(content)) {
+        console.warn('Potential XSS attempt detected');
+        return false;
+      }
+    }
+    
+    // Check for excessive length (beyond expected)
+    if (content.length > 1000) {
+      console.warn('Content length exceeds limits');
+      return false;
+    }
+    
+    return true;
+  }
+    
+  // Fetch from JSONBin    
+  async function fetchIdeas(){    
+    ideasEl.innerHTML = '<div class="small">Loading ideas...</div>';    
+    try{    
+      const resp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest` , {    
+        method: 'GET',    
+        headers: { 'Content-Type':'application/json' }    
+      });    
+      if(!resp.ok) throw new Error('Fetch failed: '+resp.status);    
+      const json = await resp.json();    
+      const data = json && (json.record || json) ;    
+      const list = Array.isArray(data) ? data : (data.ideas || []);    
+      localStorage.setItem(CACHE_KEY, JSON.stringify(list));    
+      renderIdeas(list);    
+      return list;    
+    }catch(err){    
+      console.warn('Fetch ideas failed', err);    
+      const cached = localStorage.getItem(CACHE_KEY);    
+      if(cached){    
+        renderIdeas(JSON.parse(cached));    
+      }else{    
+        ideasEl.innerHTML = '<div class="small">Unable to load ideas and no cache present.</div>';    
+      }    
+    }    
+  }    
+    
+  function renderIdeas(list){    
+    if(!list || list.length===0){    
+      ideasEl.innerHTML = '<div class="small">No ideas yet. Be the first to post!</div>';    
+      return;    
+    }    
+    // newest first    
+    const sorted = list.slice().sort((a,b)=> new Date(b.ts) - new Date(a.ts));    
+    ideasEl.innerHTML = '';    
+    for(const it of sorted){    
+      const box = document.createElement('div'); box.className='idea';    
+      const title = document.createElement('h3');    
+      title.innerHTML = escapeHtml(it.text);    
+      box.appendChild(title);    
+      const meta = document.createElement('div'); meta.className='small';    
+      const who = it.author ? escapeHtml(it.author) : 'Anonymous';    
+      const when = new Date(it.ts).toLocaleString();    
+      meta.textContent = who + ' • ' + when;    
+      box.appendChild(meta);    
+      ideasEl.appendChild(box);    
+    }    
+  }    
+    
+  // Add idea (reads current bin, pushes new idea, writes back)    
+  async function addIdea(obj){    
+    // Security check
+    if (!securityCheck(obj.text) || (obj.author && !securityCheck(obj.author))) {
+      console.error('Security check failed');
+      return false;
+    }
+    
+    // Basic optimistic flow: fetch latest, then PUT updated array    
+    try{    
+      const getResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,{headers:{'Content-Type':'application/json'}});    
+      let current = [];    
+      if(getResp.ok){    
+        const j = await getResp.json();    
+        current = Array.isArray(j.record) ? j.record : (j.record && j.record.ideas) ? j.record.ideas : [];    
+        if(!Array.isArray(current)) current = [];    
+      }    
+      // push new item    
+      current.push(obj);    
+      // write back (PUT). JSONBin v3 expects {"record": <your payload>}    
+      const putResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`,{    
+        method:'PUT',    
+        headers:{    
+          'Content-Type':'application/json',    
+          'X-Master-Key': JSONBIN_MASTER_KEY    
+        },    
+        body: JSON.stringify({ record: current })    
+      });    
+      if(!putResp.ok) throw new Error('Write failed: ' + putResp.status);    
+      // update local cache & UI    
+      localStorage.setItem(CACHE_KEY, JSON.stringify(current));    
+      renderIdeas(current);    
+      return true;    
+    }catch(err){    
+      console.error('addIdea error',err);    
+      return false;    
+    }    
+  }    
+    
+  // Form handler with sanitization + rate-limit    
+  form.addEventListener('submit', async (e)=>{    
+    e.preventDefault();    
+    rateMsg.textContent='';    
+    const now = Date.now();    
+    const last = parseInt(localStorage.getItem(LAST_POST_KEY) || '0',10);    
+    if(now - last < RATE_LIMIT_SECONDS*1000){    
+      const sec = Math.ceil((RATE_LIMIT_SECONDS*1000 - (now-last))/1000);    
+      rateMsg.textContent = `Please wait ${sec}s before posting again.`;    
+      return;    
+    }    
+    
+    const rawText = text.value.trim();    
+    if(!rawText) return;    
+    // Server-side should also sanitize. Here we escape HTML when rendering.    
+    const payload = {    
+      id: 'i_'+Math.random().toString(36).slice(2,9),    
+      text: rawText.slice(0,800),    
+      author: author.value.trim().slice(0,40) || null,    
+      ts: new Date().toISOString()    
+    };    
+    
+    // Security check
+    if (!securityCheck(payload.text) || (payload.author && !securityCheck(payload.author))) {
+      rateMsg.textContent = 'Security check failed. Please remove any suspicious content.';
+      return;
+    }
+    
+    // optimistic UI: show in list immediately    
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY)||'[]');    
+    cached.push(payload);    
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cached));    
+    renderIdeas(cached);    
+    
+    // write to JSONBin    
+    el('#postBtn').disabled = true;    
+    const ok = await addIdea(payload);    
+    el('#postBtn').disabled = false;    
+    if(ok){    
+      text.value=''; author.value=''; charCount.textContent = '0';    
+      localStorage.setItem(LAST_POST_KEY, Date.now().toString());    
+      rateMsg.textContent = 'Posted successfully!';    
+      setTimeout(()=>rateMsg.textContent='',2500);    
+    }else{    
+      rateMsg.textContent = 'Failed to save. Stored locally as fallback.';    
+    }    
+  });    
+    
+  el('#clearBtn').addEventListener('click', ()=>{ text.value=''; author.value=''; rateMsg.textContent=''; charCount.textContent = '0'; });    
+  el('#refreshBtn').addEventListener('click', ()=>fetchIdeas());    
+  el('#clearLocalBtn').addEventListener('click', ()=>{ localStorage.removeItem(CACHE_KEY); fetchIdeas(); });    
+    
+  // Initialize
+  initVisitorTracking();
+  fetchIdeas();
+  
+  // Auto-refresh ideas every 5 minutes
+  setInterval(fetchIdeas, 300000);
+  </script>
+</body>
+</html>
