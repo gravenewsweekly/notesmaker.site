@@ -2,57 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notes Maker— Public</title>
   <meta name="description" content="Public Notes Maker (no accounts). Save your personal notes for free!" />
   <style>
-    /* 1995-era CSS styling with enhanced effects */
+    /* 1995-era CSS styling with enhanced effects and mobile responsiveness */
+    :root {
+      --primary-color: #000080;
+      --secondary-color: #800000;
+      --background-color: #c0c0c0;
+      --card-color: #ffffff;
+      --text-color: #000000;
+      --border-color: #808080;
+      --accent-color: #dcdcdc;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
-      background-color: #c0c0c0;
-      color: #000000;
+      background-color: var(--background-color);
+      color: var(--text-color);
       font-family: "Times New Roman", Times, serif;
       margin: 0;
       padding: 8px;
       background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQImWP4//8/AwMjEIOVAQApCgSDLG1nJgAAAABJRU5ErkJggg==');
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     
     h1 {
-      font-size: 24px;
+      font-size: clamp(20px, 5vw, 24px);
       font-weight: bold;
-      color: #000080;
+      color: var(--primary-color);
       text-align: center;
       margin: 12px 0;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
     
     h2 {
-      font-size: 18px;
+      font-size: clamp(16px, 4vw, 18px);
       font-weight: bold;
-      color: #000080;
+      color: var(--primary-color);
       margin: 10px 0;
-      border-bottom: 1px solid #808080;
+      border-bottom: 1px solid var(--border-color);
       padding-bottom: 4px;
     }
     
     h3 {
-      font-size: 16px;
+      font-size: clamp(14px, 3.5vw, 16px);
       font-weight: bold;
-      color: #800000;
+      color: var(--secondary-color);
       margin: 8px 0;
     }
     
     .wrap {
       max-width: 800px;
+      width: 100%;
       margin: 0 auto;
-      background-color: #ffffff;
-      border: 2px solid #000080;
+      background-color: var(--card-color);
+      border: 2px solid var(--primary-color);
       padding: 12px;
       box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.3);
+      flex: 1;
     }
     
     header {
       text-align: center;
-      border-bottom: 2px solid #000080;
+      border-bottom: 2px solid var(--primary-color);
       padding-bottom: 12px;
       margin-bottom: 12px;
     }
@@ -60,11 +79,12 @@
     .lead {
       font-style: italic;
       margin: 8px 0;
+      font-size: clamp(14px, 3vw, 16px);
     }
     
     .card {
-      background-color: #dcdcdc;
-      border: 2px solid #808080;
+      background-color: var(--accent-color);
+      border: 2px solid var(--border-color);
       padding: 12px;
       margin-bottom: 12px;
     }
@@ -75,31 +95,34 @@
     
     textarea, input[type=text], input[type=email] {
       width: 100%;
-      padding: 4px;
-      border: 2px solid #808080;
+      padding: 8px;
+      border: 2px solid var(--border-color);
       background-color: #ffffff;
       font-family: "Courier New", Courier, monospace;
       margin-bottom: 8px;
+      font-size: 16px; /* Prevents zoom on iOS */
     }
     
     button {
-      background-color: #dcdcdc;
-      color: #000000;
-      border: 2px outset #dcdcdc;
-      padding: 4px 8px;
+      background-color: var(--accent-color);
+      color: var(--text-color);
+      border: 2px outset var(--accent-color);
+      padding: 8px 12px;
       font-family: Arial, Helvetica, sans-serif;
       font-weight: bold;
       cursor: pointer;
       margin-right: 4px;
+      min-height: 36px;
     }
     
-    button:hover {
+    button:hover, button:focus {
       background-color: #c0c0c0;
+      outline: 1px dotted #000000;
     }
     
     .meta {
       font-size: 12px;
-      color: #808080;
+      color: var(--border-color);
       margin-top: 8px;
     }
     
@@ -109,10 +132,11 @@
     
     .idea {
       background-color: #f0f0f0;
-      border: 1px solid #808080;
+      border: 1px solid var(--border-color);
       padding: 8px;
       margin-bottom: 8px;
       transition: all 0.3s ease;
+      word-break: break-word;
     }
     
     .idea:hover {
@@ -127,17 +151,20 @@
     
     .small {
       font-size: 12px;
-      color: #808080;
+      color: var(--border-color);
     }
     
     .footer {
       margin-top: 12px;
-      border-top: 1px solid #808080;
+      border-top: 1px solid var(--border-color);
       padding-top: 8px;
     }
     
     .controls {
       margin: 8px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
     }
     
     ul {
@@ -161,24 +188,25 @@
     .copyright {
       text-align: center;
       font-size: 11px;
-      color: #808080;
+      color: var(--border-color);
       margin-top: 16px;
-      border-top: 1px dotted #808080;
+      border-top: 1px dotted var(--border-color);
       padding-top: 8px;
     }
     
     .counter {
       text-align: right;
       font-size: 10px;
-      color: #808080;
+      color: var(--border-color);
     }
     
     .marquee {
-      background-color: #000080;
+      background-color: var(--primary-color);
       color: #ffffff;
       padding: 4px;
       margin-bottom: 12px;
       font-weight: bold;
+      overflow: hidden;
     }
     
     .security-badge {
@@ -190,17 +218,20 @@
     
     .tab-container {
       display: flex;
-      border-bottom: 1px solid #808080;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-color);
       margin-bottom: 12px;
     }
     
     .tab {
-      padding: 4px 8px;
-      background-color: #dcdcdc;
-      border: 1px solid #808080;
+      padding: 8px 12px;
+      background-color: var(--accent-color);
+      border: 1px solid var(--border-color);
       border-bottom: none;
       margin-right: 4px;
       cursor: pointer;
+      min-width: 60px;
+      text-align: center;
     }
     
     .tab.active {
@@ -223,14 +254,14 @@
     .tooltip {
       position: relative;
       display: inline-block;
-      border-bottom: 1px dotted #000080;
+      border-bottom: 1px dotted var(--primary-color);
       cursor: help;
     }
     
     .tooltip .tooltiptext {
       visibility: hidden;
       width: 200px;
-      background-color: #000080;
+      background-color: var(--primary-color);
       color: #fff;
       text-align: center;
       border-radius: 4px;
@@ -247,6 +278,74 @@
     .tooltip:hover .tooltiptext {
       visibility: visible;
       opacity: 1;
+    }
+    
+    /* Mobile-specific styles */
+    @media (max-width: 600px) {
+      .wrap {
+        padding: 8px;
+        border-width: 1px;
+      }
+      
+      .tab {
+        padding: 6px 8px;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+      
+      .card {
+        padding: 8px;
+      }
+      
+      button {
+        padding: 8px;
+        margin-bottom: 4px;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+    }
+    
+    /* Loading animation */
+    .loader {
+      border: 4px solid var(--accent-color);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #333;
+      color: white;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* Improved focus styles for accessibility */
+    button:focus, input:focus, textarea:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
     }
   </style>
 </head>
@@ -280,7 +379,7 @@
         
         <input type="text" id="author" placeholder="Name (optional)" maxlength="40" />
         
-        <div style="margin-top: 8px;">
+        <div class="controls">
           <button id="postBtn" type="submit">Post Idea</button>
           <button id="clearBtn" type="button">Clear Form</button>
         </div>
@@ -299,7 +398,7 @@
     <section class="card tab-content" id="browse-tab">
       <h2>Your Notes <span class="blink">*NEW*</span></h2>
       
-      <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap">
         <strong>Recent submissions:</strong>
         <div class="controls">
           <button id="refreshBtn">Refresh</button>
@@ -307,7 +406,9 @@
         </div>
       </div>
       
-      <div id="ideas" class="ideas" style="margin-top:12px">Loading ideas...</div>
+      <div id="ideas" class="ideas" style="margin-top:12px">
+        <div class="loader"></div>
+      </div>
       
       <div class="footer">
         <div class="small">Notes are automatically refreshed every 5 minutes.</div>
@@ -315,11 +416,11 @@
     </section>
     
     <section class="card tab-content" id="about-tab">
-      <h2>About This Notes Maksr</h2>
+      <h2>About This Notes Maker</h2>
       <p>This is a space for saving ideas and suggestions. All content is accessible and moderated by the community.</p>
       
       <h3>Our Mission</h3>
-      <p>We aim to provide a platform for creative minds to save their thoughts and collaborate on innovative concepts. This board serves as a digital brainstorming space where ideas can be save.</p>
+      <p>We aim to provide a platform for creative minds to save their thoughts and collaborate on innovative concepts. This board serves as a digital brainstorming space where ideas can be saved.</p>
       
       <h3>How It Works</h3>
       <ul>
@@ -390,6 +491,9 @@
     <div class="counter">Page generated on: <script>document.write(new Date().toLocaleString());</script></div>
   </div>
   
+  <!-- Toast notification element -->
+  <div id="toast" class="toast"></div>
+  
   <script>
   // ========== CONFIG ==========    
   const JSONBIN_BIN_ID = '68b4696c43b1c97be9323481';    
@@ -409,7 +513,17 @@
   const rateMsg = el('#rateMsg');    
   const charCount = el('#charCount');    
   const visitorCount = el('#visitorCount');    
-    
+  const toastEl = el('#toast');
+  
+  // Show toast notification
+  function showToast(message, duration = 3000) {
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+    setTimeout(() => {
+      toastEl.classList.remove('show');
+    }, duration);
+  }
+
   // Security and tracking keys
   const CACHE_KEY = 'idea_board_cache_v2';    
   const LAST_POST_KEY = 'idea_board_last_post_timestamp';    
@@ -426,6 +540,11 @@
       // Activate clicked tab
       tab.classList.add('active');
       el(`#${tab.dataset.tab}-tab`).classList.add('active');
+      
+      // If browsing tab is selected, refresh ideas
+      if (tab.dataset.tab === 'browse') {
+        fetchIdeas();
+      }
     });
   });
   
@@ -447,11 +566,13 @@
     let count = parseInt(localStorage.getItem('visitor_count') || '0');
     count++;
     localStorage.setItem('visitor_count', count.toString());
-    visitorCount.textContent = count;
+    visitorCount.textContent = count.toLocaleString();
   }
   
   // Security: Detect and prevent common attacks
   function securityCheck(content) {
+    if (!content) return true;
+    
     // Check for common XSS patterns
     const xssPatterns = [
       /<script.*?>.*?<\/script>/gi,
@@ -484,7 +605,7 @@
     
   // Fetch from JSONBin    
   async function fetchIdeas(){    
-    ideasEl.innerHTML = '<div class="small">Loading ideas...</div>';    
+    ideasEl.innerHTML = '<div class="loader"></div>';    
     try{    
       const resp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest` , {    
         method: 'GET',    
@@ -502,6 +623,7 @@
       const cached = localStorage.getItem(CACHE_KEY);    
       if(cached){    
         renderIdeas(JSON.parse(cached));    
+        showToast('Using cached data. Connection issue.', 3000);
       }else{    
         ideasEl.innerHTML = '<div class="small">Unable to load ideas and no cache present.</div>';    
       }    
@@ -517,11 +639,13 @@
     const sorted = list.slice().sort((a,b)=> new Date(b.ts) - new Date(a.ts));    
     ideasEl.innerHTML = '';    
     for(const it of sorted){    
-      const box = document.createElement('div'); box.className='idea';    
+      const box = document.createElement('div'); 
+      box.className='idea';    
       const title = document.createElement('h3');    
       title.innerHTML = escapeHtml(it.text);    
       box.appendChild(title);    
-      const meta = document.createElement('div'); meta.className='small';    
+      const meta = document.createElement('div'); 
+      meta.className='small';    
       const who = it.author ? escapeHtml(it.author) : 'Anonymous';    
       const when = new Date(it.ts).toLocaleString();    
       meta.textContent = who + ' • ' + when;    
@@ -578,11 +702,15 @@
     if(now - last < RATE_LIMIT_SECONDS*1000){    
       const sec = Math.ceil((RATE_LIMIT_SECONDS*1000 - (now-last))/1000);    
       rateMsg.textContent = `Please wait ${sec}s before posting again.`;    
+      showToast(`Please wait ${sec}s before posting again.`, 2000);
       return;    
     }    
     
     const rawText = text.value.trim();    
-    if(!rawText) return;    
+    if(!rawText) {
+      showToast('Please enter some text for your idea.', 2000);
+      return;
+    }    
     // Server-side should also sanitize. Here we escape HTML when rendering.    
     const payload = {    
       id: 'i_'+Math.random().toString(36).slice(2,9),    
@@ -594,6 +722,7 @@
     // Security check
     if (!securityCheck(payload.text) || (payload.author && !securityCheck(payload.author))) {
       rateMsg.textContent = 'Security check failed. Please remove any suspicious content.';
+      showToast('Security check failed. Please remove any suspicious content.', 3000);
       return;
     }
     
@@ -611,22 +740,45 @@
       text.value=''; author.value=''; charCount.textContent = '0';    
       localStorage.setItem(LAST_POST_KEY, Date.now().toString());    
       rateMsg.textContent = 'Posted successfully!';    
+      showToast('Idea posted successfully!', 2000);
       setTimeout(()=>rateMsg.textContent='',2500);    
     }else{    
       rateMsg.textContent = 'Failed to save. Stored locally as fallback.';    
+      showToast('Failed to save online. Stored locally.', 3000);
     }    
   });    
     
-  el('#clearBtn').addEventListener('click', ()=>{ text.value=''; author.value=''; rateMsg.textContent=''; charCount.textContent = '0'; });    
-  el('#refreshBtn').addEventListener('click', ()=>fetchIdeas());    
-  el('#clearLocalBtn').addEventListener('click', ()=>{ localStorage.removeItem(CACHE_KEY); fetchIdeas(); });    
-    
-  // Initialize
-  initVisitorTracking();
-  fetchIdeas();
+  el('#clearBtn').addEventListener('click', ()=>{ 
+    text.value=''; 
+    author.value='';
+    charCount.textContent = '0';
+    showToast('Form cleared.', 1500);
+  });
+  
+  el('#refreshBtn').addEventListener('click', () => {
+    showToast('Refreshing ideas...', 1500);
+    fetchIdeas();
+  });
+  
+  el('#clearLocalBtn').addEventListener('click', () => {
+    localStorage.removeItem(CACHE_KEY);
+    ideasEl.innerHTML = '<div class="small">Local cache cleared. Refresh to load from server.</div>';
+    showToast('Local cache cleared.', 2000);
+  });
   
   // Auto-refresh ideas every 5 minutes
-  setInterval(fetchIdeas, 300000);
+  setInterval(fetchIdeas, 5 * 60 * 1000);
+  
+  // Initialize the app
+  document.addEventListener('DOMContentLoaded', function() {
+    initVisitorTracking();
+    fetchIdeas();
+    
+    // Add touch-friendly class to body for mobile devices
+    if ('ontouchstart' in document.documentElement) {
+      document.body.classList.add('touch-device');
+    }
+  });
   </script>
 </body>
 </html>
