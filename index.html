@@ -609,7 +609,10 @@
     try{    
       const resp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest` , {    
         method: 'GET',    
-        headers: { 'Content-Type':'application/json' }    
+        headers: { 
+          'Content-Type':'application/json',
+          'X-Master-Key': JSONBIN_MASTER_KEY
+        }    
       });    
       if(!resp.ok) throw new Error('Fetch failed: '+resp.status);    
       const json = await resp.json();    
@@ -635,7 +638,7 @@
       ideasEl.innerHTML = '<div class="small">No ideas yet. Be the first to post!</div>';    
       return;    
     }    
-    // newest first    
+    // newest first (reverse chronological order)
     const sorted = list.slice().sort((a,b)=> new Date(b.ts) - new Date(a.ts));    
     ideasEl.innerHTML = '';    
     for(const it of sorted){    
@@ -659,126 +662,130 @@
     // Security check
     if (!securityCheck(obj.text) || (obj.author && !securityCheck(obj.author))) {
       console.error('Security check failed');
+      showToast('Security check failed. Please try again.', 3000);
+      return false;
+    }
+    
+    // Rate limiting
+    const now = Date.now();
+    const lastPost = localStorage.getItem(LAST_POST_KEY);
+    if (lastPost && (now - lastPost) < (RATE_LIMIT_SECONDS * 1000)) {
+      const remaining = Math.ceil((RATE_LIMIT_SECONDS * 1000 - (now - lastPost)) / 1000);
+      rateMsg.textContent = `Please wait ${remaining} seconds before posting again.`;
+      showToast(`Please wait ${remaining} seconds before posting again.`, 3000);
       return false;
     }
     
     // Basic optimistic flow: fetch latest, then PUT updated array    
     try{    
-      const getResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,{headers:{'Content-Type':'application/json'}});    
-      let current = [];    
-      if(getResp.ok){    
-        const j = await getResp.json();    
-        current = Array.isArray(j.record) ? j.record : (j.record && j.record.ideas) ? j.record.ideas : [];    
-        if(!Array.isArray(current)) current = [];    
-      }    
-      // push new item    
-      current.push(obj);    
-      // write back (PUT). JSONBin v3 expects {"record": <your payload>}    
-      const putResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`,{    
-        method:'PUT',    
-        headers:{    
-          'Content-Type':'application/json',    
-          'X-Master-Key': JSONBIN_MASTER_KEY    
-        },    
-        body: JSON.stringify({ record: current })    
-      });    
-      if(!putResp.ok) throw new Error('Write failed: ' + putResp.status);    
-      // update local cache & UI    
-      localStorage.setItem(CACHE_KEY, JSON.stringify(current));    
-      renderIdeas(current);    
-      return true;    
-    }catch(err){    
-      console.error('addIdea error',err);    
-      return false;    
+      // Fetch current data
+      const resp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {    
+        method: 'GET',    
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Master-Key': JSONBIN_MASTER_KEY
+        }    
+      });
+      
+      if(!resp.ok) throw new Error('Fetch failed: '+resp.status);    
+      const json = await resp.json();    
+      const data = json && (json.record || json);
+      const list = Array.isArray(data) ? data : (data.ideas || []);
+      
+      // Add new idea
+      list.push(obj);
+      
+      // Update the bin
+      const updateResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JSONBIN_MASTER_KEY
+        },
+        body: JSON.stringify(list)
+      });
+      
+      if(!updateResp.ok) throw new Error('Update failed: '+updateResp.status);
+      
+      // Update local cache and UI
+      localStorage.setItem(CACHE_KEY, JSON.stringify(list));
+      localStorage.setItem(LAST_POST_KEY, now.toString());
+      rateMsg.textContent = '';
+      
+      // Show success message
+      showToast('Idea posted successfully!', 2000);
+      
+      // Clear form
+      form.reset();
+      charCount.textContent = '0';
+      
+      // Refresh the ideas list if we're on the browse tab
+      if (el('#browse-tab').classList.contains('active')) {
+        renderIdeas(list);
+      }
+      
+      return true;
+    } catch(err) {    
+      console.error('Add idea failed', err);    
+      showToast('Failed to post idea. Please try again.', 3000);
+      return false;
     }    
   }    
     
-  // Form handler with sanitization + rate-limit    
+  // Form submission handler    
   form.addEventListener('submit', async (e)=>{    
     e.preventDefault();    
-    rateMsg.textContent='';    
-    const now = Date.now();    
-    const last = parseInt(localStorage.getItem(LAST_POST_KEY) || '0',10);    
-    if(now - last < RATE_LIMIT_SECONDS*1000){    
-      const sec = Math.ceil((RATE_LIMIT_SECONDS*1000 - (now-last))/1000);    
-      rateMsg.textContent = `Please wait ${sec}s before posting again.`;    
-      showToast(`Please wait ${sec}s before posting again.`, 2000);
-      return;    
-    }    
-    
-    const rawText = text.value.trim();    
-    if(!rawText) {
-      showToast('Please enter some text for your idea.', 2000);
-      return;
-    }    
-    // Server-side should also sanitize. Here we escape HTML when rendering.    
-    const payload = {    
-      id: 'i_'+Math.random().toString(36).slice(2,9),    
-      text: rawText.slice(0,800),    
-      author: author.value.trim().slice(0,40) || null,    
+    const ideaText = text.value.trim();    
+    if(!ideaText) return;    
+        
+    const obj = {    
+      text: ideaText,    
+      author: author.value.trim(),    
       ts: new Date().toISOString()    
     };    
+        
+    const postBtn = el('#postBtn');    
+    postBtn.disabled = true;    
+    postBtn.textContent = 'Posting...';    
+        
+    const success = await addIdea(obj);    
+        
+    postBtn.disabled = false;    
+    postBtn.textContent = 'Post Idea';    
+  });    
     
-    // Security check
-    if (!securityCheck(payload.text) || (payload.author && !securityCheck(payload.author))) {
-      rateMsg.textContent = 'Security check failed. Please remove any suspicious content.';
-      showToast('Security check failed. Please remove any suspicious content.', 3000);
-      return;
-    }
+  // Clear form button    
+  el('#clearBtn').addEventListener('click', ()=>{    
+    form.reset();    
+    charCount.textContent = '0';    
+    rateMsg.textContent = '';    
+  });    
     
-    // optimistic UI: show in list immediately    
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY)||'[]');    
-    cached.push(payload);    
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cached));    
-    renderIdeas(cached);    
+  // Refresh button    
+  el('#refreshBtn').addEventListener('click', ()=>{    
+    fetchIdeas();    
+    showToast('Refreshing ideas...', 1500);
+  });    
     
-    // write to JSONBin    
-    el('#postBtn').disabled = true;    
-    const ok = await addIdea(payload);    
-    el('#postBtn').disabled = false;    
-    if(ok){    
-      text.value=''; author.value=''; charCount.textContent = '0';    
-      localStorage.setItem(LAST_POST_KEY, Date.now().toString());    
-      rateMsg.textContent = 'Posted successfully!';    
-      showToast('Idea posted successfully!', 2000);
-      setTimeout(()=>rateMsg.textContent='',2500);    
-    }else{    
-      rateMsg.textContent = 'Failed to save. Stored locally as fallback.';    
-      showToast('Failed to save online. Stored locally.', 3000);
+  // Clear local cache button    
+  el('#clearLocalBtn').addEventListener('click', ()=>{    
+    if(confirm('Clear local cache? This will remove all locally stored notes.')){    
+      localStorage.removeItem(CACHE_KEY);    
+      ideasEl.innerHTML = '<div class="small">Cache cleared. Refresh to fetch latest ideas.</div>';    
+      showToast('Local cache cleared', 2000);
     }    
   });    
     
-  el('#clearBtn').addEventListener('click', ()=>{ 
-    text.value=''; 
-    author.value='';
-    charCount.textContent = '0';
-    showToast('Form cleared.', 1500);
-  });
-  
-  el('#refreshBtn').addEventListener('click', () => {
-    showToast('Refreshing ideas...', 1500);
-    fetchIdeas();
-  });
-  
-  el('#clearLocalBtn').addEventListener('click', () => {
-    localStorage.removeItem(CACHE_KEY);
-    ideasEl.innerHTML = '<div class="small">Local cache cleared. Refresh to load from server.</div>';
-    showToast('Local cache cleared.', 2000);
-  });
-  
-  // Auto-refresh ideas every 5 minutes
-  setInterval(fetchIdeas, 5 * 60 * 1000);
-  
-  // Initialize the app
-  document.addEventListener('DOMContentLoaded', function() {
+  // Initialize    
+  function init(){    
     initVisitorTracking();
-    fetchIdeas();
+    fetchIdeas();    
+    // Auto-refresh every 5 minutes    
+    setInterval(fetchIdeas, 5 * 60 * 1000);    
+  }    
     
-    // Add touch-friendly class to body for mobile devices
-    if ('ontouchstart' in document.documentElement) {
-      document.body.classList.add('touch-device');
-    }
-  });
+  // Start the app    
+  init();    
   </script>
 </body>
 </html>
